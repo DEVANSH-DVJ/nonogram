@@ -1,2 +1,1 @@
-# nonogram
-Nonogram solver
+# Nonogram solver
