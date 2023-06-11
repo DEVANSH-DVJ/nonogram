@@ -142,6 +142,7 @@ def display(state, cols, rows):
                    labelleft=True, labeltop=True, labelsize=20)
     ax.grid()
     plt.savefig('nonogram.png')
+    plt.close(fig)
 
 
 if __name__ == '__main__':
@@ -153,15 +154,16 @@ if __name__ == '__main__':
     cols, rows = extract(filename)
 
     state = -np.ones((len(cols), len(rows)), dtype=int)
-    # np.random.seed(0)
-    # state = np.random.randint(-1, 2, size=(len(cols), len(rows)))
 
-    print(state)
-    display(state, cols, rows)
+    change = True
+    while change:
+        change = False
+        for i in range(len(cols)):
+            change |= update(state, 'C', i, cols[i])
 
-    update(state, 'C', 0, cols[0])
-    update(state, 'R', 7, rows[7])
-    update(state, 'R', 8, rows[8])
+        for i in range(len(rows)):
+            change |= update(state, 'R', i, rows[i])
 
-    print(state)
+        display(state, cols, rows)
+
     display(state, cols, rows)
