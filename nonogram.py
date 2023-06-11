@@ -1,29 +1,41 @@
 import sys
 
 
+def validate(cols, rows):
+    length = len(cols)
+    assert length == len(rows), "Error: length == len(rows) == len(cols)"
+    for col in cols:
+        assert sum(col) <= length, "Error: sum(col) <= length"
+    for row in rows:
+        assert sum(row) <= length, "Error: sum(row) <= length"
+    print(length)
+
+
 def extract(filename):
-    col = []
-    row = []
+    cols = []
+    rows = []
     with open(filename, 'r') as f:
         lines = f.readlines()
         curr = 'NA'
         for line in lines:
             line = line[:-1]
             if curr == 'NA':
-                if line == 'C':
-                    curr = 'C'
-                else:
-                    print("Error: first line must be 'C'")
+                assert line == 'C', "Error: first line must be 'C'"
+                curr = 'C'
             elif curr == 'C':
                 if line == 'R':
                     curr = 'R'
                 else:
-                    col.append(list(map(int, line.split(' '))))
+                    cols.append(list(map(int, line.split(' '))))
             elif curr == 'R':
-                row.append(list(map(int, line.split(' '))))
+                rows.append(list(map(int, line.split(' '))))
 
-    print(col)
-    print(row)
+    print(cols)
+    print(rows)
+
+    validate(cols, rows)
+
+    return cols, rows
 
 
 if __name__ == '__main__':
@@ -32,4 +44,4 @@ if __name__ == '__main__':
         sys.exit(1)
 
     filename = sys.argv[1]
-    extract(filename)
+    cols, rows = extract(filename)
