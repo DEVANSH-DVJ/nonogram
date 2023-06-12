@@ -115,6 +115,16 @@ def extract(filename):
     return cols, rows
 
 
+def add_lines(ax, shape):
+    for i in range(0, shape[0] + 1, 5):
+        ax.plot([i - 0.5, i - 0.5], [-0.5, shape[1] - 0.5],
+                color='blue', linewidth=5)
+
+    for i in range(0, shape[1] + 1, 5):
+        ax.plot([-0.5, shape[0] - 0.5], [i - 0.5, i - 0.5],
+                color='blue', linewidth=5)
+
+
 def display(state, cols, rows):
     fig = plt.figure(figsize=(state.shape[0], state.shape[1]))
     ax = fig.add_subplot(1, 1, 1)
@@ -124,6 +134,8 @@ def display(state, cols, rows):
         for j in range(state.shape[1]):
             if state[i][j] == 0:
                 ax.plot(j, i, marker='x', color='black', markersize=40)
+
+    add_lines(ax, state.shape)
 
     ax.set_xlim(-0.5, state.shape[0] - 0.5)
     ax.set_ylim(state.shape[1] - 0.5, -0.5)
