@@ -40,6 +40,7 @@ def update(state, axis, idx, true_summary):
         assert False, 'Error: axis should be C or R'
     print(f'\nUpdating {axis}{idx}')
     print(f'Current value: {curr}')
+    print(f'True summary: {true_summary}')
 
     pos = np.where(curr == 1)[0]
     unknown = np.where(curr == -1)[0]
@@ -79,13 +80,10 @@ def update(state, axis, idx, true_summary):
 
 
 def validate(cols, rows):
-    length = len(cols)
-    assert length == len(rows), 'Error: length == len(rows) == len(cols)'
     for col in cols:
-        assert sum(col) + len(col) - 1 <= length, f'Col Error: {col}'
+        assert sum(col) + len(col) - 1 <= len(rows), f'Col Error: {col}'
     for row in rows:
-        assert sum(row) + len(row) - 1 <= length, f'Row Error: {row}'
-    print(length)
+        assert sum(row) + len(row) - 1 <= len(cols), f'Row Error: {row}'
 
 
 def extract(filename):
@@ -116,17 +114,17 @@ def extract(filename):
 
 
 def add_lines(ax, shape):
-    for i in range(0, shape[0] + 1, 5):
-        ax.plot([i - 0.5, i - 0.5], [-0.5, shape[1] - 0.5],
+    for i in range(0, shape[1] + 1, 5):
+        ax.plot([i - 0.5, i - 0.5], [-0.5, shape[0] - 0.5],
                 color='blue', linewidth=5)
 
-    for i in range(0, shape[1] + 1, 5):
-        ax.plot([-0.5, shape[0] - 0.5], [i - 0.5, i - 0.5],
+    for i in range(0, shape[0] + 1, 5):
+        ax.plot([-0.5, shape[1] - 0.5], [i - 0.5, i - 0.5],
                 color='blue', linewidth=5)
 
 
 def display(state, cols, rows):
-    fig = plt.figure(figsize=(state.shape[0], state.shape[1]))
+    fig = plt.figure(figsize=(state.shape[1], state.shape[0]))
     ax = fig.add_subplot(1, 1, 1)
 
     ax.imshow(state, cmap=colors.ListedColormap(['white', 'white', 'black']))
@@ -137,14 +135,14 @@ def display(state, cols, rows):
 
     add_lines(ax, state.shape)
 
-    ax.set_xlim(-0.5, state.shape[0] - 0.5)
-    ax.set_ylim(state.shape[1] - 0.5, -0.5)
+    ax.set_xlim(-0.5, state.shape[1] - 0.5)
+    ax.set_ylim(state.shape[0] - 0.5, -0.5)
 
-    ax.set_xticks(minor=False, ticks=np.array(range(state.shape[0])) - 0.5)
-    ax.set_yticks(minor=False, ticks=np.array(range(state.shape[1])) - 0.5)
-    ax.set_xticks(minor=True, ticks=np.array(range(state.shape[0])),
+    ax.set_xticks(minor=False, ticks=np.array(range(state.shape[1])) - 0.5)
+    ax.set_yticks(minor=False, ticks=np.array(range(state.shape[0])) - 0.5)
+    ax.set_xticks(minor=True, ticks=np.array(range(state.shape[1])),
                   labels=['\n'.join(map(str, col)) for col in cols])
-    ax.set_yticks(minor=True, ticks=np.array(range(state.shape[1])),
+    ax.set_yticks(minor=True, ticks=np.array(range(state.shape[0])),
                   labels=['  '.join(map(str, row)) for row in rows])
 
     ax.xaxis.tick_top()
@@ -165,7 +163,9 @@ if __name__ == '__main__':
     filename = sys.argv[1]
     cols, rows = extract(filename)
 
-    state = -np.ones((len(cols), len(rows)), dtype=int)
+    state = -np.ones((len(rows), len(cols)), dtype=int)
+    print(state.shape)
+    display(state, cols, rows)
 
     change = True
     while change:
