@@ -8,6 +8,43 @@ from matplotlib import colors
 from itertools import chain, combinations
 
 
+# Helper functions related to initialize nonogram state #
+
+def init(filename):
+    cols = []
+    rows = []
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+        curr = 'NA'
+        for line in lines:
+            line = line[:-1]
+            if curr == 'NA':
+                assert line == 'C', 'Error: first line must be C'
+                curr = 'C'
+            elif curr == 'C':
+                if line == 'R':
+                    curr = 'R'
+                else:
+                    cols.append(list(map(int, line.split(' '))))
+            elif curr == 'R':
+                rows.append(list(map(int, line.split(' '))))
+
+    for col in cols:
+        assert sum(col) + len(col) - 1 <= len(rows), f'Col Error: {col}'
+    for row in rows:
+        assert sum(row) + len(row) - 1 <= len(cols), f'Row Error: {row}'
+
+    state = -np.ones((len(rows), len(cols)), dtype=int)
+
+    print(cols)
+    print(rows)
+    print(state.shape)
+
+    return cols, rows, state
+
+
+# Helper functions related to updating nonogram state #
+
 def powerset(iterable):
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
@@ -79,39 +116,7 @@ def update(state, axis, idx, true_summary):
     return True
 
 
-def validate(cols, rows):
-    for col in cols:
-        assert sum(col) + len(col) - 1 <= len(rows), f'Col Error: {col}'
-    for row in rows:
-        assert sum(row) + len(row) - 1 <= len(cols), f'Row Error: {row}'
-
-
-def extract(filename):
-    cols = []
-    rows = []
-    with open(filename, 'r') as f:
-        lines = f.readlines()
-        curr = 'NA'
-        for line in lines:
-            line = line[:-1]
-            if curr == 'NA':
-                assert line == 'C', 'Error: first line must be C'
-                curr = 'C'
-            elif curr == 'C':
-                if line == 'R':
-                    curr = 'R'
-                else:
-                    cols.append(list(map(int, line.split(' '))))
-            elif curr == 'R':
-                rows.append(list(map(int, line.split(' '))))
-
-    print(cols)
-    print(rows)
-
-    validate(cols, rows)
-
-    return cols, rows
-
+# Helper functions related to display nonogram state #
 
 def add_lines(ax, shape):
     for i in range(0, shape[1] + 1, 5):
@@ -161,10 +166,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     filename = sys.argv[1]
-    cols, rows = extract(filename)
-
-    state = -np.ones((len(rows), len(cols)), dtype=int)
-    print(state.shape)
+    cols, rows, state = init(filename)
     display(state, cols, rows)
 
     change = True
@@ -179,3 +181,5 @@ if __name__ == '__main__':
         display(state, cols, rows)
 
     display(state, cols, rows)
+
+    print('\nSolved!')
